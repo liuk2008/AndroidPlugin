@@ -1,0 +1,38 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+
+    repositories {
+        google()
+        jcenter()
+//        maven {
+//            //Gradle插件发布在本地仓库
+//            url uri('plugin-viewinject/repository')
+//        }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.0.2"
+
+        // 配置bintray插件
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+//        classpath 'com.android.plugin:viewinject:1.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url "https://jitpack.io" }
+        maven {
+            url 'https://dl.bintray.com/chanba2010/library/'
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

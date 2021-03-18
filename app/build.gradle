@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+//apply plugin: 'com.android.plugin.viewinject'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.android.library"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    signingConfigs {
+        release {
+            storeFile file("../release.jks")
+            storePassword "123456"
+            keyAlias "product"
+            keyPassword "123456"
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable true
+            minifyEnabled true                                          // 是否进行混淆
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true                                         // 移除无用的resource文件
+            zipAlignEnabled true                                        // Zipalign优化
+            signingConfig signingConfigs.release
+        }
+    }
+
+    // 移除lint检查的error
+    lintOptions {
+        abortOnError false
+        disable 'GoogleAppIndexingWarning'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
