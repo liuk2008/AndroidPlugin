@@ -1,0 +1,109 @@
+//    1、编译library文件  gradlew install
+//    2、上传            gradlew bintrayUpload
+ext {
+    bintrayRepo = 'plugin'   // 修改成bintrayRepo上创建的 maven name
+    bintrayName = 'injectclass' // 修改成bintrayRepo上创建的 package name
+
+    publishedGroupId = 'com.android.plugin' // 发布的组织名称
+    artifact = 'injectclass'            // 依赖的lib名称
+    libraryVersion = '1.1'   // 版本号
+
+    username = 'chanba2010'
+    userkey = 'c45f983479dd72be69d3af6a09ad9045a6312909'
+
+    // 开发者信息
+    developer = [
+            developerId   : 'liuk',
+            developerName : 'liuk',
+            developerEmail: '471636288@qq.com'
+    ]
+
+    // 项目描述
+    library = [
+            libraryName       : 'injectclass',
+            libraryDescription: 'InjectClass插件',
+            siteUrl           : 'https://github.com/liuk2008/AndriodLibrary.git'
+    ]
+
+}
+
+group = publishedGroupId
+version = libraryVersion
+
+// 配置 bintray
+apply plugin: 'com.jfrog.bintray'
+// This is the library version used when deploying the artifact
+if (project.hasProperty("android")) { // Android libraries
+    task sourcesJar(type: Jar) {   // 生成源文件
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+    task javadoc(type: Javadoc) {  // 生成Javadoc文档
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+} else { // Java libraries
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+}
+
+// 解决上传Javadoc generation failed. Generated Javadoc options
+tasks.withType(Javadoc) {
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+// 文档打包成jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// 上传到JCenter所需要的源码文件
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = username
+    key = userkey
+    configurations = ['archives']
+    pkg {
+        // 注意：这里的repo、name必须要和你创建Maven仓库的时候的名字一样
+        repo = bintrayRepo
+        name = bintrayName
+        desc = library.libraryDescription
+        websiteUrl = library.siteUrl
+        publish = true
+    }
+}
+
+// 配置maven库
+apply plugin: 'com.github.dcendents.android-maven'
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                groupId publishedGroupId
+                artifactId artifact
+                name library.libraryName
+                description library.libraryDescription
+                url library.siteUrl
+                // 开发者信息
+                developers {
+                    developer {
+                        id developer.developerId
+                        name developer.developerName
+                        email developer.developerEmail
+                    }
+                }
+            }
+        }
+    }
+}

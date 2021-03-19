@@ -1,0 +1,31 @@
+apply plugin: 'groovy'
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        // 配置bintray插件
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+    }
+}
+
+dependencies {
+    // gradle sdk 使用项目中指定的gradle wrapper版本，插件中使用的Project对象等就来自这里
+    implementation  gradleApi()
+    // groovy sdk
+    implementation  localGroovy()
+    // Android编译的大部分gradle源码，比如TaskManager、ransform API
+    implementation 'com.android.tools.build:gradle:4.0.2'
+    //引入javassist类库
+    implementation 'org.javassist:javassist:3.24.0-GA'
+}
+
+repositories {
+    google()
+    jcenter()
+}
+
+//apply from: 'bintray.gradle'
