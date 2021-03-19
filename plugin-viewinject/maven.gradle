@@ -1,0 +1,18 @@
+
+//添加maven plugin, 用于发布本地插件
+apply plugin: 'maven'
+
+// 生成本地仓库
+group = 'com.android.plugin'
+archivesBaseName = 'viewinject'
+version = '1.0'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //在当前同级目录下生成maven包
+            repository(url: uri('repository'))
+        }
+    }
+}
+
