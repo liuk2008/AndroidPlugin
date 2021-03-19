@@ -1,10 +1,29 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.android.plugin.viewinject'
 
+
+//apply plugin: 'com.android.plugin.injectclass'
+//apply plugin: com.android.plugin.InjectClassPlugin
+
+//injectClass {
+//    dirClass "com.freestyle.other.MainActivity"
+//    dirCode "android.widget.Toast.makeText(this,\"修改dir中的代码\",android.widget.Toast.LENGTH_SHORT).show();"
+//    jarName ":test"
+//    jarClass "com.android.test.TestActivity"
+//    jarCode "android.widget.Toast.makeText(this,\"修改jar包中的代码\",android.widget.Toast.LENGTH_SHORT).show();"
+//}
+
+
+//定义打包时间
+def static getDate() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.android.library"
+        applicationId "com.android.plugin"
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
@@ -36,6 +55,19 @@ android {
         abortOnError false
         disable 'GoogleAppIndexingWarning'
     }
+
+    // 配置打包名称
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFileName = output.outputFileName
+            if (outputFileName != null && outputFileName.endsWith('.apk')) {
+                def fileName = "AndroidPlugin_v${defaultConfig.versionName}_${getDate()}_${variant.name}.apk"
+                output.outputFileName = new File(fileName)
+            }
+        }
+    }
+
+
 }
 
 dependencies {
@@ -45,4 +77,10 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //  google 分包插件
+//    implementation 'com.android.support:multidex:1.0.3'
+//    implementation 'com.android.library:viewinject:1.1'
+//    annotationProcessor 'com.android.library:viewinject-compiler:1.1'
+//    implementation project(':test')
 }

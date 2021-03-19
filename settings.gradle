@@ -1,2 +1,4 @@
-include ':app'
+include ':app', ':lib-test'
 rootProject.name = "AndroidPlugin"
+include ':plugin-injectclass'
+include ':plugin-viewinject'
