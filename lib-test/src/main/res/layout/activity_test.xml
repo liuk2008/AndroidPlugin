@@ -11,9 +11,9 @@
         android:text="btn_view" />
 
     <Button
-        android:id="@+id/btn_test1"
+        android:id="@+id/btn_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="btn_test1" />
+        android:text="btn_test" />
 
 </LinearLayout>

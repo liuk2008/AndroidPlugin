@@ -5,12 +5,20 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.ide.common.internal.WaitableExecutor
 import com.android.utils.FileUtils
 import org.apache.commons.codec.digest.DigestUtils
-import org.apache.http.util.TextUtils
 import org.gradle.api.Project
 
 import java.util.concurrent.Callable
 
 /**
+ * 读取R.class中的id值
+ *      1、低版本Gradle插件，会在指定目录生成R.class，通过读取 R.class文件中的内部类Id.class，在指定目录生成新的Id.class
+ *      2、高版本Gradle插件，R.class文件不再输出，只存在于R.jar包中，无法通过读取R.class文件的内部类Id.class，生成新的Id.class
+ *          解决办法：
+ *              1、读取R.jar包中的 R.class文件，获取内部类Id.class内容
+ *              2、在R.jar目录下，生成指定的 com.viewinject.bindview.Id.class
+ *              3、将R.jar包中的class文件，复制在transform目录下，生成新的jar包
+ *              4、将新生成的 Id.class，输出到jar包中
+ *
  * Created by liuk on 2019/4/15
  */
 class GenerateClassTransform extends Transform {
@@ -90,7 +98,7 @@ class GenerateClassTransform extends Transform {
                     }
                 })
             }
-            // 遍历jar文件，但不做操作
+            // 遍历jar文件
             input.jarInputs.each { JarInput jarInput ->
 //                processJarInput(outputProvider, jarInput, isIncremental)
                 // 异步并发处理jar/class
@@ -119,7 +127,7 @@ class GenerateClassTransform extends Transform {
         File outputFile = outputProvider.getContentLocation(jarName + "-" + md5Hex, jarInput.contentTypes, jarInput.scopes, Format.JAR)
 
         /*
-         * 读取R.jar包，生成class文件
+         * 读取R.jar包，生成Id.class文件
          * Gradle插件升级后，R.class文件不再输出，只存在于R.jar包中，无法通过读取 R.class文件的内部类Id.class，生成新的Id.class
          * 解决办法：
          *      1、读取R.jar包中的 R.class文件，获取内部类Id.class内容

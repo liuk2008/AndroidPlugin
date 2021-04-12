@@ -14,7 +14,7 @@ public class TestActivity extends AppCompatActivity {
 
     @MyBindView(resId = "btn_view")
     Button btn_view;
-    @MyBindView(resId = "btn_test1")
+    @MyBindView(resId = "btn_test")
     Button btn_test;
 
 
@@ -32,7 +32,7 @@ public class TestActivity extends AppCompatActivity {
         btn_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "btn_test1", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "btn_test", Toast.LENGTH_SHORT).show();
             }
         });
     }

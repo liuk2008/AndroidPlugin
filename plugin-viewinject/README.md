@@ -35,6 +35,16 @@
       2、lib包无法使用viewinject工具
     * 执行步骤：
       1、定义 Gradle Plugin 插件，注册 Transform，同时获取 manifest packageName
-      2、根据指定的 packageName，获取 Transform 输出的 R.class
-      3、读取 R.class 中内部类 id.class，生成 Id.class，输出到指定的文件路径
-      4、Gradle升级后，R.class文件不再输出，只存在于R.jar包中
+      2、定义 Transform，遍历jar文件和文件夹，根据指定的 packageName，读取R.jar包
+      3、读取 R.class 中内部类 id.class，生成指定的 Id.class，输出到指定的文件路径
+
+
+**注意**
+
+    * 1、低版本Gradle插件，会在指定目录生成R.class，通过读取 R.class文件中的内部类Id.class，在指定目录生成新的Id.class
+    * 2、高版本Gradle插件，R.class文件不再输出，只存在于R.jar包中，无法通过读取R.class文件的内部类Id.class，生成新的Id.class
+         * 解决办法：
+         * 1、读取R.jar包中的 R.class文件，获取内部类Id.class内容
+         * 2、在R.jar目录下，生成指定的 com.viewinject.bindview.Id.class
+         * 3、将R.jar包中的class文件，复制在transform目录下，生成新的jar包
+         * 4、将新生成的 Id.class，输出到jar包中
