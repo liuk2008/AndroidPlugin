@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.android.plugin.viewinject'
+apply plugin: 'com.android.plugin.viewinject'
 
 
 //apply plugin: 'com.android.plugin.injectclass'
@@ -77,10 +77,10 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-
     //  google 分包插件
-//    implementation 'com.android.support:multidex:1.0.3'
-//    implementation 'com.android.library:viewinject:1.1'
-//    annotationProcessor 'com.android.library:viewinject-compiler:1.1'
-//    implementation project(':test')
+    implementation 'com.android.support:multidex:1.0.3'
+
+    implementation 'com.android.library:viewinject:1.1'
+    annotationProcessor 'com.android.library:viewinject-compiler:1.1'
+    implementation project(':lib-test')
 }

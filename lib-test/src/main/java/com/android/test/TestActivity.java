@@ -36,4 +36,10 @@ public class TestActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MyViewInjector.unbindView(this);
+    }
 }

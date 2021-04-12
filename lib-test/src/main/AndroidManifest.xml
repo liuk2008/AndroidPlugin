@@ -3,7 +3,7 @@
     package="com.android.test">
 
     <application>
-        <activity android:name=".TestActivity"></activity>
+        <activity android:name=".TestActivity"/>
     </application>
 
 </manifest>
