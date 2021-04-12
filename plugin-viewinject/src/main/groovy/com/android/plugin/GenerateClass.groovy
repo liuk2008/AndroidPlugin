@@ -47,13 +47,7 @@ class GenerateClass {
             if (rCtClass == null)
                 return
 
-            // 删除旧文件
-            String output = srcPath.substring(0, srcPath.lastIndexOf("\\"))
-            String idPath = output + "\\com\\viewinject\\bindview\\Id.class"
-            File file = new File(idPath)
-            FileUtils.deleteIfExists(file)
-
-            // 获取 R.class 文件中的内部类
+            // 获取 R.class 文件中的内部类，生成Id.class
             CtClass[] rCtClasses = rCtClass.getNestedClasses()
             idClass = pool.makeClass("com.viewinject.bindview.Id")
 
@@ -85,7 +79,7 @@ class GenerateClass {
             fos = new FileOutputStream(new File(outputPath))
             jos = new JarOutputStream(fos)
             project.logger.error("====== 指定目录：======" + outputPath)
-            // 读取jar包
+            // 读取 jar包
             JarFile jarFile = new JarFile(srcPath)
             Enumeration<JarEntry> entries = jarFile.entries()
 
