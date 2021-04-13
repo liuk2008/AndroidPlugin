@@ -2,6 +2,7 @@ package com.android.plugin
 
 import com.android.utils.FileUtils
 import com.google.common.io.ByteStreams
+import javassist.ClassPath
 import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtField
@@ -32,7 +33,7 @@ class GenerateClass {
     static void generateIdForJar(Project project, String packageName, String srcPath, String outputPath) {
 
         // 将当前路径加入类池 , 不然找不到这个类
-        pool.appendClassPath(srcPath)
+        ClassPath classPath = pool.appendClassPath(srcPath)
 
         // 定义Class类
         CtClass rCtClass = null, idClass = null
@@ -42,38 +43,27 @@ class GenerateClass {
 
         try {
             //  读取 R.jar 包，加载 R.class 文件
-            String className = packageName + ".R"
+            String className = packageName + ".R" + "\$id"
             rCtClass = pool.getOrNull(className)
             if (rCtClass == null)
                 return
 
             // 获取 R.class 文件中的内部类，生成Id.class
-            CtClass[] rCtClasses = rCtClass.getNestedClasses()
             idClass = pool.makeClass("com.viewinject.bindview.Id")
-
-            // 读取 R.class 内部类 Id.class，创建指定目录下新 Id.class
-            rCtClasses.each { CtClass innerClass ->
-                if ((className + "\$id").equals(innerClass.name)) {
-                    project.logger.error("====== 扫描 " + innerClass.name + " 文件 ======")
-                    CtField[] ctFields = innerClass.getDeclaredFields()
-                    ctFields.each { CtField ctField ->
-                        String name = ctField.name
-                        int value = ctField.constantValue
-                        String field = "  public static final int " + name + " = " + value + ";"
-                        CtField idField = CtField.make(field, idClass)
-                        idClass.addField(idField)
-                        project.logger.error("id : " + name + " --> " + value)
-                    }
-                    project.logger.error("====== 共计" + ctFields.length + "个id ======")
-                }
-                // 从ClassPool中释放，避免内存溢出
-                innerClass.detach()
+            project.logger.error("====== 扫描 " + rCtClass.name + " 文件 ======")
+            // 解冻
+            if (rCtClass.isFrozen()) rCtClass.defrost()
+            // 会提示 R.jar: 另一个程序正在使用此文件，进程无法访问。
+            CtField[] ctFields = rCtClass.getDeclaredFields()
+            ctFields.each { CtField ctField ->
+                String name = ctField.name
+                int value = ctField.constantValue
+                String field = "  public static final int " + name + " = " + value + ";"
+                CtField idField = CtField.make(field, idClass)
+                idClass.addField(idField)
+                project.logger.error("id : " + name + " --> " + value)
             }
-            /**
-             * 如果一个 CtClass 对象通过 writeFile(), toClass(), toBytecode() 被转换成一个类文件，
-             * 此 CtClass 对象会被冻结起来，不允许再修改。因为一个类只能被 JVM 加载一次。
-             */
-            project.logger.error("====== 生成 com.viewject.bindview.Id.class 文件 ======")
+            project.logger.error("====== 共计" + ctFields.length + "个id ======")
 
             // 设置 jar 包输出路径
             fos = new FileOutputStream(new File(outputPath))
@@ -87,6 +77,7 @@ class GenerateClass {
             // 将指定目录下新 Id.class，输出到jar包中
             jos.putNextEntry(new JarEntry("com/viewinject/bindview/Id.class"))
             jos.write(idClass.toBytecode())
+            project.logger.error("====== 生成 com.viewject.bindview.Id.class 文件 ======")
 
             // 遍历jar包，在指定目录生成新的jar包
             while (entries.hasMoreElements()) {
@@ -97,7 +88,9 @@ class GenerateClass {
                 jos.putNextEntry(new JarEntry(jarEntry.name))
                 // 向指定路径下的jar包复制class文件
                 ByteStreams.copy(jis, jos)
+                jis.close()
             }
+            jarFile.close()
             project.logger.error("====== 生成指定目录的 jar 包 ======")
 
         } catch (Exception e) {
@@ -113,6 +106,7 @@ class GenerateClass {
                 jos.close()
             if (fos != null)
                 fos.close()
+            pool.removeClassPath(classPath)
         }
 
     }
